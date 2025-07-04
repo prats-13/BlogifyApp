@@ -15,15 +15,19 @@ function Signup() {
   const create=async(data)=>{
     setError("")
     try{
-      const userData=await authService.createAccount(data)
-      if(userData){
-        const userData=await authService.getCurrentUser()
-        if(userData) dispatch(login(userData))
-        navigate("/")
+      const session = await authService.createAccount(data);
+      if (!session) throw new Error("Account creation failed.");
+
+      const userData = await authService.getCurrentUser();
+      if (!userData) throw new Error("Could not fetch user after signup.");
+
+      dispatch(login(userData));
+      navigate("/");
+    } catch (error) {
+        console.error("Signup error:", error);
+        setError(error.message || "Signup failed");
       }
-    } catch(error){
-      setError(error.message)
-    }
+
   }
   return (
     <div className='flex items-center justify-center'>
